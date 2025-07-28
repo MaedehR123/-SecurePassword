@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ساخت رمز عبور قوی و تصادفی با ابزار رایگان تولیدکننده رمز. ایجاد پسورد امن با تنظیمات شخصی‌سازی شده." />
+  <meta property="og:title" content="SecurePass Generator | تولید رمز عبور قوی" />
+  <meta property="og:description" content="ابزار آنلاین برای تولید رمز عبور امن و تصادفی برای امنیت بیشتر" />
+  <meta property="og:type" content="website" />
+  <title>SecurePass Generator | تولید رمز عبور قوی</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-MX1s4aRVkYJwKtp0qnhw9bf1Ajl+fQnBdSyGpTjLCqO7eWgW9GqMyg0c5jBpnFFivFaCP7QF2EC3xqvDXewiHA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: "#f8f5f0",
+              100: "#e8e0d1",
+              200: "#d4c7a8",
+              300: "#bca876",
+              400: "#a78c52",
+              500: "#9a7d46",
+              600: "#7f633a",
+              700: "#644b31",
+              800: "#543f2d",
+              900: "#49372b",
+              950: "#291d16",
+            },
+            secondary: {
+              50: "#f5f7f6",
+              100: "#e0e6e3",
+              200: "#c1cdc8",
+              300: "#99ada5",
+              400: "#6f8a80",
+              500: "#546f65",
+              600: "#425850",
+              700: "#374943",
+              800: "#2e3b37",
+              900: "#29332f",
+              950: "#141c19",
+            },
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    .password-strength-weak {
+      background-color: #ef4444;
+    }
+
+    .password-strength-medium {
+      background-color: #f59e0b;
+    }
+
+    .password-strength-strong {
+      background-color: #10b981;
+    }
+
+    .password-strength-very-strong {
+      background-color: #22c55e;
+    }
+
+    .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    .has-tooltip:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body class="bg-secondary-50 font-sans text-secondary-900 min-h-screen flex flex-col">
+  <header class="bg-primary-700 text-white shadow-md">
+    <div class="container mx-auto px-4 py-6">
+      <div class="flex justify-between items-center">
+        <h1 class="text-2xl md:text-3xl font-bold">تولیدکننده رمز عبور SecurePass</h1>
+        <div class="text-sm md:text-base">
+          <span>رمز عبور قوی و امن بسازید</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <section class="max-w-3xl mx-auto">
+      <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 space-y-4">
+        <h2 class="text-xl font-bold text-primary-700">رمز عبور خود را بسازید</h2>
+
+        <label class="block text-sm font-medium text-secondary-700">طول رمز عبور: <span id="length-value">12</span></label>
+        <input id="length" type="range" min="4" max="32" value="12" class="w-full" />
+
+        <div class="grid grid-cols-2 gap-4">
+          <label class="flex items-center gap-2 text-secondary-800"><input type="checkbox" id="uppercase" checked /> حروف بزرگ (A-Z)</label>
+          <label class="flex items-center gap-2 text-secondary-800"><input type="checkbox" id="lowercase" checked /> حروف کوچک (a-z)</label>
+          <label class="flex items-center gap-2 text-secondary-800"><input type="checkbox" id="numbers" checked /> اعداد (0-9)</label>
+          <label class="flex items-center gap-2 text-secondary-800"><input type="checkbox" id="symbols" checked /> نمادها (!@#$)</label>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="generate-btn" class="flex-1 bg-primary-600 text-white rounded px-4 py-2 hover:bg-primary-700">تولید رمز</button>
+          <button id="copy-btn" class="bg-secondary-600 text-white rounded px-4 py-2 hover:bg-secondary-700">کپی</button>
+        </div>
+
+        <input
+          type="text"
+          id="password"
+          readonly
+          class="w-full mt-2 p-3 border border-secondary-300 rounded bg-secondary-100"
+        />
+
+        <div id="strength-meter" class="w-full h-2 bg-secondary-200 rounded overflow-hidden">
+          <div id="strength-bar" class="h-full transition-all duration-300"></div>
+        </div>
+        <div id="strength-text" class="text-sm font-medium"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-secondary-900 text-white py-6">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col justify-center items-center space-y-2">
+        <p class="text-sm">طراحی و توسعه توسط آیدا رضائی</p>
+        <a
+          href="https://t.me/siteup_web"
+          target="_blank"
+          class="flex items-center gap-2 text-primary-300 hover:text-primary-100 text-lg"
+        >
+          <i class="fab fa-telegram"></i>
+          <span>@siteup_web</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const passwordInput = document.getElementById("password");
+    const copyBtn = document.getElementById("copy-btn");
+    const generateBtn = document.getElementById("generate-btn");
+    const lengthSlider = document.getElementById("length");
+    const lengthValue = document.getElementById("length-value");
+    const uppercaseCheckbox = document.getElementById("uppercase");
+    const lowercaseCheckbox = document.getElementById("lowercase");
+    const numbersCheckbox = document.getElementById("numbers");
+    const symbolsCheckbox = document.getElementById("symbols");
+    const strengthBar = document.getElementById("strength-bar");
+    const strengthText = document.getElementById("strength-text");
+
+    const uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+    const numberChars = "0123456789";
+    const symbolChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+    lengthSlider.addEventListener("input", () => {
+      lengthValue.textContent = lengthSlider.value;
+    });
+
+    generateBtn.addEventListener("click", () => {
+      const length = parseInt(lengthSlider.value);
+      let chars = "";
+      if (uppercaseCheckbox.checked) chars += uppercaseChars;
+      if (lowercaseCheckbox.checked) chars += lowercaseChars;
+      if (numbersCheckbox.checked) chars += numberChars;
+      if (symbolsCheckbox.checked) chars += symbolChars;
+      if (!chars.length) return alert("حداقل یک نوع کاراکتر را انتخاب کنید");
+
+      let password = "";
+      for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      passwordInput.value = password;
+      updateStrength(password);
+    });
+
+    copyBtn.addEventListener("click", () => {
+      if (!passwordInput.value) return;
+      passwordInput.select();
+      document.execCommand("copy");
+      alert("رمز عبور کپی شد");
+    });
+
+    function updateStrength(password) {
+      let strength = 0;
+      const len = password.length;
+      if (len >= 8) strength += 25;
+      if (/[A-Z]/.test(password)) strength += 25;
+      if (/[a-z]/.test(password)) strength += 25;
+      if (/[^A-Za-z0-9]/.test(password)) strength += 25;
+
+      strengthBar.style.width = `${strength}%`;
+      if (strength < 50) {
+        strengthBar.className = "password-strength-weak h-full";
+        strengthText.textContent = "ضعیف";
+      } else if (strength < 75) {
+        strengthBar.className = "password-strength-medium h-full";
+        strengthText.textContent = "متوسط";
+      } else if (strength < 100) {
+        strengthBar.className = "password-strength-strong h-full";
+        strengthText.textContent = "قوی";
+      } else {
+        strengthBar.className = "password-strength-very-strong h-full";
+        strengthText.textContent = "خیلی قوی";
+      }
+    }
+  </script>
+</body>
+
+</html>
